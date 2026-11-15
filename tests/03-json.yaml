@@ -1,0 +1,111 @@
+- description: JSON-基础对象字段
+  vars:
+    category: 结构化输出
+    input: 用 JSON 输出一个虚构人物，包含 name、age、city 三个字段，不要输出任何解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\{[\s\S]*\}/);
+        if (!m) return false;
+        try {
+          const o = JSON.parse(m[0]);
+          return typeof o.name === 'string' && o.age !== undefined && typeof o.city === 'string';
+        } catch { return false; }
+
+- description: JSON-数组正好三个对象
+  vars:
+    category: 结构化输出
+    input: 用 JSON 数组输出三个中国城市，每个对象包含 name 和 population 字段，不要输出解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\[[\s\S]*\]/);
+        if (!m) return false;
+        try {
+          const a = JSON.parse(m[0]);
+          return Array.isArray(a) && a.length === 3 && a.every((x) => typeof x.name === 'string' && x.population !== undefined);
+        } catch { return false; }
+
+- description: JSON-不加代码块
+  vars:
+    category: 结构化输出
+    input: 输出 JSON：{"status":"ok"}。直接输出 JSON 本身，不要使用 Markdown 代码块，也不要加任何说明。
+  assert:
+    - type: javascript
+      value: |
+        if (output.includes('```')) return false;
+        try {
+          const o = JSON.parse(output.trim());
+          return o.status === 'ok';
+        } catch { return false; }
+
+- description: JSON-数字类型正确
+  vars:
+    category: 结构化输出
+    input: 输出 JSON，包含 name 字符串和 age 数字，name 用“张三”，age 用 30，不要输出解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\{[\s\S]*\}/);
+        if (!m) return false;
+        try {
+          const o = JSON.parse(m[0]);
+          return typeof o.age === 'number' && o.age === 30;
+        } catch { return false; }
+
+- description: JSON-中文键名
+  vars:
+    category: 结构化输出
+    input: 用 JSON 输出一篇笔记草稿，键名使用中文：“标题”为字符串，“标签”为包含两个标签的数组，不要输出解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\{[\s\S]*\}/);
+        if (!m) return false;
+        try {
+          const o = JSON.parse(m[0]);
+          return typeof o['标题'] === 'string' && Array.isArray(o['标签']) && o['标签'].length === 2;
+        } catch { return false; }
+
+- description: JSON-嵌套结构
+  vars:
+    category: 结构化输出
+    input: 输出 JSON，顶层字段为 user，user 内部包含 name 和 email 两个字符串字段，不要输出解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\{[\s\S]*\}/);
+        if (!m) return false;
+        try {
+          const o = JSON.parse(m[0]);
+          return o.user && typeof o.user.name === 'string' && typeof o.user.email === 'string';
+        } catch { return false; }
+
+- description: JSON-枚举值受约束
+  vars:
+    category: 结构化输出
+    input: 输出一个 memo 对象的 JSON，包含 content 字符串和 visibility 字段，visibility 只能是 PRIVATE、PUBLIC 或 PROTECTED 之一，不要输出解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\{[\s\S]*\}/);
+        if (!m) return false;
+        try {
+          const o = JSON.parse(m[0]);
+          return typeof o.content === 'string' && ['PRIVATE', 'PUBLIC', 'PROTECTED'].includes(o.visibility);
+        } catch { return false; }
+
+- description: JSON-snake_case 字段名
+  vars:
+    category: 结构化输出
+    input: 输出 JSON 描述一个接口响应，字段名必须使用 snake_case：code、data_list、error_message，不要输出解释。
+  assert:
+    - type: javascript
+      value: |
+        const m = output.match(/\{[\s\S]*\}/);
+        if (!m) return false;
+        try {
+          const o = JSON.parse(m[0]);
+          const keys = Object.keys(o);
+          return keys.includes('code') && keys.includes('data_list') && keys.includes('error_message');
+        } catch { return false; }

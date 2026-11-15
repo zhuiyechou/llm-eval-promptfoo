@@ -1,0 +1,78 @@
+- description: 业务-可见性取值
+  vars:
+    category: 产品问答
+    context: Memos 的 memo 可见性有三种：PRIVATE（仅自己可见）、PROTECTED（登录用户可见）、PUBLIC（所有人可见）。
+    input: Memos 的可见性有哪几种？
+  assert:
+    - type: icontains
+      value: PRIVATE
+    - type: icontains
+      value: PROTECTED
+    - type: icontains
+      value: PUBLIC
+
+- description: 业务-如何归档 memo
+  vars:
+    category: 产品问答
+    context: 在 memo 卡片的 More 菜单中选择 Pin 可以置顶；选择 Archive 可以归档。归档后 memo 从时间线隐藏，可在 Archived 页面查看。
+    input: 如何把一条 memo 归档？归档后会怎样？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /Archive|归档/.test(t) && /(隐藏|看不到|不显示|Archived|归档页)/.test(t);
+
+- description: 业务-数据库超出知识范围
+  vars:
+    category: 产品问答
+    context: Memos 默认使用 SQLite 存储数据，数据文件保存在本地。
+    input: Memos 支持 MySQL 吗？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        const hedge = /(不确定|无法确认|没有提到|未提及|不知道|没有说明)/.test(t);
+        const overclaims = /(不支持|不能使用|无法使用|肯定不支持)/.test(t);
+        return hedge && !overclaims;
+
+- description: 业务-快捷键无参考知识
+  vars:
+    category: 产品问答
+    input: Memos 有哪些快捷键？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /(不确定|无法确认|没有|未提及|不知道|查不到|没有找到|无法提供)/.test(t);
+
+- description: 业务-多用户支持无参考知识
+  vars:
+    category: 产品问答
+    input: Memos 支持多用户吗？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /(不确定|无法确认|没有|未提及|不知道|查不到|没有找到|无法提供)/.test(t);
+
+- description: 业务-超额处理依据参考知识
+  vars:
+    category: 产品问答
+    context: 免费版每月最多创建 1000 条 memo，超出后需要联系管理员升级套餐。
+    input: 我的 memo 数量超过免费额度了，该怎么办？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /(联系管理员|升级|管理员)/.test(t);
+
+- description: 业务-置顶操作步骤
+  vars:
+    category: 产品问答
+    context: 置顶方式：打开 memo 卡片右上角的 More 菜单，选择 Pin，memo 会固定在时间线顶部。
+    input: 怎么把一条 memo 置顶？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /Pin|置顶/.test(t) && /(More|更多|菜单)/.test(t);

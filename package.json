@@ -1,0 +1,16 @@
+{
+  "name": "llm-eval-promptfoo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "本地大模型评测工程：promptfoo + Ollama，58 条中文评测用例，输出模型×类别矩阵",
+  "scripts": {
+    "eval": "promptfoo eval -o results.json -j 8 --no-cache",
+    "matrix": "node scripts/matrix.mjs",
+    "report": "node scripts/report.mjs",
+    "view": "promptfoo view",
+    "all": "promptfoo eval -o results.json -j 8 --no-cache && node scripts/matrix.mjs && node scripts/report.mjs"
+  },
+  "devDependencies": {
+    "promptfoo": "0.125.1"
+  }
+}

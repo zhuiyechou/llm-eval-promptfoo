@@ -1,0 +1,74 @@
+- description: 边界-空输入
+  vars:
+    category: 边界输入
+    input: ""
+  assert:
+    - type: javascript
+      value: |
+        const t = output.trim();
+        if (!t) return false;
+        if (/error|exception|traceback|undefined/i.test(t)) return false;
+        return /(问题|请|可以|需要|帮助|输入|内容)/.test(t);
+
+- description: 边界-超长输入
+  vars:
+    category: 边界输入
+    input: |
+      请用一句话总结下面这段会议记录：
+      本周一上午十点，产品经理组织产品和研发同学在新版本评审会上确认了 3.0 版本的排期。
+      会议首先回顾了上个版本遗留的两个问题：移动端编辑器在低端机型上偶发卡顿，以及标签筛选在数据量大时响应偏慢。
+      研发同学表示卡顿问题已经定位到列表虚拟化的参数配置，计划本周内修复并回归；标签筛选的问题需要增加索引，排到下个迭代。
+      随后产品同学介绍了 3.0 版本的核心功能：多端同步、离线编辑、笔记模板和协作评论。
+      大家讨论了各功能的优先级，最终确定多端同步和离线编辑为必须交付项，笔记模板为可选项，协作评论推迟到 3.1。
+      关于测试安排，测试同学提出提前两周介入，先做接口自动化，再补 UI 回归，避免像上个版本那样在发布前才集中发现问题。
+      最后明确了各端负责人和关键时间点：下周三完成技术方案评审，下月底完成开发自测，再往后两周提测和修复。
+      会议还讨论了监控告警、灰度发布和老版本兼容策略，决定沿用现有方案，新增同步失败率的监控指标。
+      会议在十一点四十结束，会后由产品同学整理纪要并同步到项目文档里。
+  assert:
+    - type: javascript
+      value: |
+        const t = output.trim();
+        if (!t) return false;
+        if (/error|exception|traceback/i.test(t)) return false;
+        return t.length <= 200;
+
+- description: 边界-emoji 输入
+  vars:
+    category: 边界输入
+    input: 😀😀 帮我给这条笔记起个标题：明天上午十点产品和研发开会讨论新版本排期。
+  assert:
+    - type: javascript
+      value: |
+        const t = output.trim();
+        return t.length > 0 && t.length <= 100 && /(会|排期|版本|讨论|评审)/.test(t);
+
+- description: 边界-特殊字符与 SQL 片段
+  vars:
+    category: 边界输入
+    input: 我的笔记里写了 ' OR 1=1 -- 和 {{7*7}} 这些内容，会被系统当成 SQL 或模板执行吗？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        if (/syntax error|SQLException|TemplateError/i.test(t)) return false;
+        return /(不会|纯文本|参数化|注入|文本|转义|模板)/.test(t);
+
+- description: 边界-中英混排
+  vars:
+    category: 边界输入
+    input: Please 帮我 summarize 这段 content：Q4 OKR 需要 align 到 product roadmap。
+  assert:
+    - type: javascript
+      value: |
+        const cjk = (output.match(/[\u4e00-\u9fa5]/g) || []).length;
+        return cjk >= 8;
+
+- description: 边界-纯标点输入
+  vars:
+    category: 边界输入
+    input: "？？？？"
+  assert:
+    - type: javascript
+      value: |
+        const t = output.trim();
+        return t.length > 0 && /(问题|请|可以|需要|帮助|说明|输入)/.test(t);

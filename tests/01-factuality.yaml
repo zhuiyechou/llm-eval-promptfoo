@@ -1,0 +1,67 @@
+- description: 常识-中国首都
+  vars:
+    category: 事实与知识
+    input: 中国的首都是哪里？只回答城市名。
+  assert:
+    - type: icontains
+      value: 北京
+
+- description: 常识-水的化学式
+  vars:
+    category: 事实与知识
+    input: 水的化学式是什么？
+  assert:
+    - type: regex
+      value: "[Hh]2[Oo]|H₂O"
+
+- description: 常识-一年多少天
+  vars:
+    category: 事实与知识
+    input: 平年一年有多少天？
+  assert:
+    - type: icontains
+      value: "365"
+
+- description: 常识-光速量级
+  vars:
+    category: 事实与知识
+    input: 真空中的光速大约是多少？
+  assert:
+    - type: javascript
+      value: |
+        const t = output.replace(/[,，\s]/g, '');
+        return /299792458|299792|299800|3亿|30万|300000/.test(t);
+
+- description: 常识-地球排第三
+  vars:
+    category: 事实与知识
+    input: 地球是太阳系里从内往外数的第几颗行星？只回答序号。
+  assert:
+    - type: regex
+      value: "第三|第3"
+
+- description: 常识-水沸点
+  vars:
+    category: 事实与知识
+    input: 标准大气压下水的沸点是多少摄氏度？
+  assert:
+    - type: icontains
+      value: "100"
+
+- description: 常识-Python 之父
+  vars:
+    category: 事实与知识
+    input: Python 语言的创始人是谁？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /Guido|吉多|范罗苏姆|van Rossum/i.test(t);
+
+- description: 常识-世界最高峰
+  vars:
+    category: 事实与知识
+    input: 世界第一高峰是哪座山？
+  assert:
+    - type: icontains
+      value: 珠穆朗玛

@@ -1,0 +1,47 @@
+- description: 多语言-中译英
+  vars:
+    category: 多语言
+    input: 把“今天天气很好，适合出门散步”翻译成英文。
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /weather|nice|good|walk|stroll|outdoor/i.test(t) && /[a-zA-Z]{4,}/.test(t);
+
+- description: 多语言-英译中
+  vars:
+    category: 多语言
+    input: 把 “Good morning, have a nice day” 翻译成中文。
+  assert:
+    - type: icontains
+      value: 早上好
+
+- description: 多语言-日语问候释义
+  vars:
+    category: 多语言
+    input: 日语「こんにちは」是什么意思？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /你好|午安|下午好|问候|您好/.test(t);
+
+- description: 多语言-西班牙语道谢
+  vars:
+    category: 多语言
+    input: 用西班牙语说“谢谢”，只输出西班牙语单词。
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /gracias/i.test(t);
+
+- description: 多语言-语种识别
+  vars:
+    category: 多语言
+    input: “Bonjour, comment allez-vous ?” 这是什么语言？
+  assert:
+    - type: javascript
+      value: |
+        const t = output;
+        return /法语|French/i.test(t);
